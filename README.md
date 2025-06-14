@@ -34,12 +34,15 @@ task-manager-api/
 
 ## API Endpoints
 
-| Method | Endpoint --  | Description          | Auth Required |
-|--------|--------------|----------------------|---------------|
-| GET    | `/tasks`     | Retrieve user tasks  | ✅            |
-| POST   | `/tasks`     | add Task             | ✅            |
-| GET    | `/task/{id}` | Retrieve user tasks  | ✅            |
-| PATCH  | `/task/{id}` | Update user tasks    | ✅            |
+| Method | Endpoint        | Description                         | Auth Required |
+|--------|-----------------|-------------------------------------|---------------|
+| POST   | `/login`        | login user (create jwt token)       | ✅            |
+| POST   | `/register`     | register user                       | ✅            |
+| GET    | `/logout`       | Retrieve user tasks                 | ✅            |
+| GET    | `/tasks`        | Retrieve user tasks                 | ✅            |
+| POST   | `/tasks`        | add Task                            | ✅            |
+| GET    | `/task/{id}`    | Retrieve user tasks                 | ✅            |
+| PATCH  | `/task/{id}`    | Update user tasks                   | ✅            |
 
 > More endpoints can be added as needed.
 
