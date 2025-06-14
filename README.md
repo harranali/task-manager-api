@@ -47,6 +47,15 @@ task-manager-api/
 
 > More endpoints can be added as needed.
 
+## 📝 TODO
+- [x] implement Tasks CRUD
+- [x] implement Login
+- [x] implement Register
+- [ ] implement Logout
+- [ ] add JWT token creation
+- [ ] add logger
+- [ ] move authorization checks to middleware
+
 ### ⚙️ Prerequisites
 - 🧰 Go 1.22+ installed  
 - 🛠️ Git
