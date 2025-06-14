@@ -35,7 +35,7 @@ func (s *service) GetUserTasks(userID uint) ([]Task, error) {
 	return tasks, err
 }
 func (s *service) Delete(id uint) error {
-	return nil
+	return s.repo.Delete(id)
 }
 func (s *service) Update(updateTaskRquest UpdateTaskRequest, id uint) (Task, error) {
 	task, err := s.repo.GetById(id)

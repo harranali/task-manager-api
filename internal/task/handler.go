@@ -136,4 +136,26 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccessResponse(w, http.StatusOK, task)
 }
 
-// TODO implement Delete(id uint) error
+func (h *Handler) Delete(w http.ResponseWriter, r *http.Request) {
+	//authorize
+	token, err := h.userSrv.GetUserToken(r)
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusUnauthorized, "unauthorized request")
+		return
+	}
+	_, err = h.userSrv.GetUserByToken(token)
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusUnauthorized, "unauthorized request")
+		return
+	}
+	taskID, err := strconv.Atoi(r.PathValue("id"))
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusNotFound, "not found")
+	}
+	err = h.srv.Delete(uint(taskID))
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusInternalServerError, "something went wrong")
+		return
+	}
+	utils.WriteSuccessResponse(w, http.StatusOK, nil)
+}

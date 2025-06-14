@@ -2,6 +2,7 @@ package task
 
 import (
 	"errors"
+	"slices"
 	"sync"
 	"time"
 )
@@ -76,6 +77,14 @@ func (db *inMemoryDatabase) Update(task Task) (Task, error) {
 }
 
 func (db *inMemoryDatabase) Delete(id uint) error {
+	db.mutex.Lock()
+	defer db.mutex.Unlock()
+	for i := range db.tasks {
+		if db.tasks[i].ID == id {
+			db.tasks = slices.Delete(db.tasks, i, i+1)
+			return nil
+		}
+	}
 	return nil
 }
 func (db *inMemoryDatabase) ChagneStatus(id uint) error {
