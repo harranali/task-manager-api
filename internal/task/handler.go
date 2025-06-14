@@ -97,7 +97,7 @@ func (h *Handler) GetUserTasks(w http.ResponseWriter, r *http.Request) {
 	utils.WriteSuccessResponse(w, http.StatusOK, tasks)
 }
 
-func (h *Handler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 	// authorize
 	token, err := h.userSrv.GetUserToken(r)
 	if err != nil {
@@ -117,6 +117,7 @@ func (h *Handler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	updateTaskRequest := UpdateTaskRequest{
+		Title:  r.FormValue("title"),
 		IsDone: isDone,
 	}
 	// get task
@@ -126,7 +127,7 @@ func (h *Handler) ChangeStatus(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	// update task
-	task, err := h.srv.ChagneStatus(updateTaskRequest, uint(taskIdStr))
+	task, err := h.srv.Update(updateTaskRequest, uint(taskIdStr))
 	if err != nil {
 		utils.WriteErrorResponse(w, http.StatusInternalServerError, "something went wrong")
 		return

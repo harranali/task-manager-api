@@ -5,7 +5,7 @@ type Service interface {
 	GetById(id uint) (Task, error)
 	GetUserTasks(userID uint) ([]Task, error)
 	Delete(id uint) error
-	ChagneStatus(updateTaskRequest UpdateTaskRequest, id uint) (Task, error)
+	Update(updateTaskRequest UpdateTaskRequest, id uint) (Task, error)
 }
 
 type service struct {
@@ -37,12 +37,13 @@ func (s *service) GetUserTasks(userID uint) ([]Task, error) {
 func (s *service) Delete(id uint) error {
 	return nil
 }
-func (s *service) ChagneStatus(updateTaskRquest UpdateTaskRequest, id uint) (Task, error) {
+func (s *service) Update(updateTaskRquest UpdateTaskRequest, id uint) (Task, error) {
 	task, err := s.repo.GetById(id)
 	if err != nil {
 		return Task{}, err
 	}
 	task.IsDone = updateTaskRquest.IsDone
+	task.Title = updateTaskRquest.Title
 	task, err = s.repo.Update(task)
 	return task, err
 }

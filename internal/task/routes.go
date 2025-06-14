@@ -14,5 +14,5 @@ func RegisterRoutes(mux *http.ServeMux) {
 	mux.HandleFunc("POST /tasks", h.SaveTask)
 	mux.HandleFunc("GET /tasks/{id}", h.GetByID)
 	mux.HandleFunc("GET /tasks", h.GetUserTasks)
-	mux.HandleFunc("PATCH /tasks/{id}", h.ChangeStatus)
+	mux.HandleFunc("PATCH /tasks/{id}", h.Update)
 }
