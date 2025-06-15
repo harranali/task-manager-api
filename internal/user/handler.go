@@ -22,11 +22,29 @@ func NewHandler(srv Service) *Handler {
 }
 
 func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
-	// TODO validatae
-	loginRequest := LoginRequest{
-		Email:    r.FormValue("email"),
-		Password: r.FormValue("password"),
+	var loginRequest LoginRequest
+	err := json.NewDecoder(r.Body).Decode(&loginRequest)
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid request")
+		return
 	}
+
+	err = h.v.Struct(loginRequest)
+	if err != nil {
+		errors := make(map[string]string)
+		vErrors := err.(validator.ValidationErrors)
+		for _, fieldError := range vErrors {
+			switch fieldError.Tag() {
+			case "required":
+				errors[fieldError.Field()] = fmt.Sprintf("the %v is required", fieldError.Field())
+			case "email":
+				errors[fieldError.Field()] = fmt.Sprintf("the %v must be valid email", fieldError.Field())
+			}
+		}
+		utils.WriteErrorResponse(w, http.StatusUnprocessableEntity, errors)
+		return
+	}
+
 	// get user from the database
 	user, err := h.srv.GetByEmail(loginRequest.Email)
 	if err != nil {
