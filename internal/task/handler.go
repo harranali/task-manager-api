@@ -1,9 +1,12 @@
 package task
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/harranali/task-manager-api/internal/user"
 	"github.com/harranali/task-manager-api/utils"
 )
@@ -11,12 +14,14 @@ import (
 type Handler struct {
 	srv     Service
 	userSrv user.Service
+	v       *validator.Validate
 }
 
 func NewHandler(srv Service, userSrv user.Service) *Handler {
 	return &Handler{
 		srv:     srv,
 		userSrv: userSrv,
+		v:       validator.New(),
 	}
 }
 
@@ -33,14 +38,28 @@ func (h *Handler) SaveTask(w http.ResponseWriter, r *http.Request) {
 		utils.WriteErrorResponse(w, http.StatusUnauthorized, "unauthorized request")
 		return
 	}
-	// TODO validate
-	if r.FormValue("title") == "" {
-		utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid task title")
+
+	var createTaskRequest CreateTaskRequest
+	err = json.NewDecoder(r.Body).Decode(&createTaskRequest)
+	if err != nil {
+		utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid request")
 		return
 	}
-	var createTaskRequest = CreateTaskRequest{
-		Title: r.FormValue("title"),
+
+	err = h.v.Struct(createTaskRequest)
+	if err != nil {
+		var errors = make(map[string]string)
+		vErrors := err.(validator.ValidationErrors)
+		for _, fieldError := range vErrors {
+			switch fieldError.Tag() {
+			case "required":
+				errors[fieldError.Field()] = fmt.Sprintf("the %v is required", fieldError.Field())
+			}
+		}
+		utils.WriteErrorResponse(w, http.StatusUnprocessableEntity, errors)
+		return
 	}
+
 	task, err := h.srv.Save(createTaskRequest, user.ID)
 	if err != nil {
 		utils.WriteErrorResponse(w, http.StatusInternalServerError, "something went wrong")

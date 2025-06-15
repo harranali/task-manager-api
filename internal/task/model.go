@@ -3,8 +3,7 @@ package task
 import "time"
 
 type CreateTaskRequest struct {
-	Title  string `json:"title"`
-	IsDone bool   `json:"is_done"`
+	Title string `json:"title" validate:"required"`
 }
 
 type UpdateTaskRequest struct {
