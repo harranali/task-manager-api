@@ -3,12 +3,15 @@ package user
 import (
 	"errors"
 	"net/http"
+	"time"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 
 type Service interface {
 	GetByEmail(email string) (User, error)
 	VerifyUserPassword(user User, loginRequest LoginRequest) error
-	GenerateToken(user User) (string, error)
+	GenerateToken(user User, secret string, duration time.Duration) (string, error)
 	Register(registerRequest RegisterRequest) (User, error)
 	GetUserToken(r *http.Request) (string, error)
 	GetUserByToken(token string) (User, error)
@@ -41,9 +44,18 @@ func (s *service) VerifyUserPassword(user User, loginRequest LoginRequest) error
 	return nil
 }
 
-func (s *service) GenerateToken(user User) (string, error) {
-	// TODO use generate valid token using jwt
-	return "fksdfsfgrsgdsdf", nil
+func (s *service) GenerateToken(user User, secret string, duration time.Duration) (string, error) {
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
+		jwt.MapClaims{
+			"id":  user.ID,
+			"exp": time.Now().Add(time.Hour * duration).Unix(),
+		})
+
+	tokenString, err := token.SignedString([]byte(secret))
+	if err != nil {
+		return "", err
+	}
+	return tokenString, nil
 }
 
 func (s *service) Register(registerRequest RegisterRequest) (User, error) {

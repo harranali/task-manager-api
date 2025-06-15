@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/harranali/task-manager-api/config"
 	"github.com/harranali/task-manager-api/utils"
 )
 
@@ -58,7 +60,7 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// generate token
-	token, err := h.srv.GenerateToken(user)
+	token, err := h.srv.GenerateToken(user, config.CFG.JWTSecret, time.Duration(config.CFG.JWTDuration))
 	if err != nil {
 		utils.WriteErrorResponse(w, http.StatusInternalServerError, "something went wrong")
 		return

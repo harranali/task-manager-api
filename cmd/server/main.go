@@ -4,12 +4,24 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/harranali/task-manager-api/config"
 	"github.com/harranali/task-manager-api/internal/task"
 	"github.com/harranali/task-manager-api/internal/user"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// load env if not production
+	if os.Getenv("GO_ENV") != "production" {
+		if err := godotenv.Load(); err != nil {
+			fmt.Println("no .env file found, skipping...")
+		}
+	}
+	// init config
+	config.NewConfig()
+
 	const PORT int = 8080
 	mux := http.NewServeMux()
 

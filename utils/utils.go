@@ -3,7 +3,9 @@ package utils
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 )
 
 type ErrorResponse struct {
@@ -34,4 +36,20 @@ func WriteErrorResponse(w http.ResponseWriter, code int, message any) {
 		Message: message,
 	})
 	fmt.Fprint(w, string(response))
+}
+
+func GetEnvMust(key string) string {
+	value, ok := os.LookupEnv(key)
+	if !ok || value == "" {
+		log.Fatalf("unable to get env var: %v", key)
+	}
+	return value
+}
+
+func GetEnv(key string, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }
