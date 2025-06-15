@@ -47,6 +47,41 @@ task-manager-api/
 
 > More endpoints can be added as needed.
 
+## ✅ Request Examples
+Below are example request payloads for key endpoints:
+
+### Register User  
+**POST** `/register`  
+```json
+{
+  "name": "johndoe",
+  "email": "johndoe@example.com",
+  "password": "securepassword"
+}
+```
+### Login User  
+**POST** `/login`  
+```json
+{
+  "email": "johndoe@example.com",
+  "password": "securepassword"
+}
+```
+### Add Task
+#### Header 
+```json
+Authorization: Bearer YOUR_AUTH_TOKEN
+Content-Type: application/json
+```
+#### Body
+**POST** `/tasks`  
+```json
+{
+  "title": "my task title",
+  "is_done": "false"
+}
+```
+
 ## 📝 TODO
 - [x] implement Tasks CRUD
 - [x] implement Login
