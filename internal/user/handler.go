@@ -1,19 +1,23 @@
 package user
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/harranali/task-manager-api/utils"
 )
 
 type Handler struct {
 	srv Service
+	v   *validator.Validate
 }
 
 func NewHandler(srv Service) *Handler {
 	return &Handler{
 		srv: srv,
+		v:   validator.New(),
 	}
 }
 
@@ -48,14 +52,25 @@ func (h *Handler) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) Register(w http.ResponseWriter, r *http.Request) {
-	// TODO validate
-	registerRequest := RegisterRequest{
-		Name:     r.FormValue("name"),
-		Email:    r.FormValue("email"),
-		Password: r.FormValue("password"),
+	var registerRequest RegisterRequest
+	json.NewDecoder(r.Body).Decode(&registerRequest)
+	err := h.v.Struct(registerRequest)
+	var errors = make(map[string]string)
+	if err != nil {
+		vErrors := err.(validator.ValidationErrors)
+		for _, fieldError := range vErrors {
+			switch fieldError.Tag() {
+			case "required":
+				errors[fieldError.Field()] = fmt.Sprintf("the %v is required", fieldError.Field())
+			case "email":
+				errors[fieldError.Field()] = fmt.Sprintf("the %v must be valid email", fieldError.Field())
+			}
+		}
+		utils.WriteErrorResponse(w, http.StatusUnprocessableEntity, errors)
+		return
 	}
 	// check if user already exist
-	_, err := h.srv.GetByEmail(registerRequest.Email)
+	_, err = h.srv.GetByEmail(registerRequest.Email)
 	if err == nil {
 		utils.WriteErrorResponse(w, http.StatusBadRequest, "user already registered")
 		return

@@ -8,7 +8,7 @@ import (
 
 type ErrorResponse struct {
 	Status  string `json:"status"`
-	Message string `json:"message"`
+	Message any    `json:"message"`
 }
 
 type SuccessResponse struct {
@@ -26,7 +26,7 @@ func WriteSuccessResponse(w http.ResponseWriter, code int, data any) {
 	fmt.Fprint(w, string(response))
 }
 
-func WriteErrorResponse(w http.ResponseWriter, code int, message string) {
+func WriteErrorResponse(w http.ResponseWriter, code int, message any) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(code)
 	response, _ := json.Marshal(ErrorResponse{
