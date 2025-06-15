@@ -69,7 +69,7 @@ Below are example request payloads for key endpoints:
 ```
 ### Add Task
 #### Header 
-```json
+```http
 Authorization: Bearer YOUR_AUTH_TOKEN
 Content-Type: application/json
 ```
