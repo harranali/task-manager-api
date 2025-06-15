@@ -128,17 +128,28 @@ func (h *Handler) Update(w http.ResponseWriter, r *http.Request) {
 		utils.WriteErrorResponse(w, http.StatusUnauthorized, "unauthorized request")
 		return
 	}
-	// validate input
-	isDoneStr := r.FormValue("is_done")
-	isDone, err := strconv.ParseBool(isDoneStr)
+	var updateTaskRequest UpdateTaskRequest
+	err = json.NewDecoder(r.Body).Decode(&updateTaskRequest)
 	if err != nil {
 		utils.WriteErrorResponse(w, http.StatusBadRequest, "invalid request")
 		return
 	}
-	updateTaskRequest := UpdateTaskRequest{
-		Title:  r.FormValue("title"),
-		IsDone: isDone,
+	err = h.v.Struct(updateTaskRequest)
+	if err != nil {
+		var errors = make(map[string]string)
+		vErrors := err.(validator.ValidationErrors)
+
+		for _, fieldError := range vErrors {
+			switch fieldError.Tag() {
+			case "required":
+				errors[fieldError.Field()] = fmt.Sprintf("the %v is required", fieldError.Field())
+			case "boolean":
+				errors[fieldError.Field()] = fmt.Sprintf("the %v must be boolean", fieldError.Field())
+			}
+		}
+		utils.WriteErrorResponse(w, http.StatusUnprocessableEntity, errors)
 	}
+
 	// get task
 	taskIdStr, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {

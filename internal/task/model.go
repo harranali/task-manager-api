@@ -7,8 +7,8 @@ type CreateTaskRequest struct {
 }
 
 type UpdateTaskRequest struct {
-	Title  string `json:"title"`
-	IsDone bool   `json:"is_done"`
+	Title  string `json:"title" validate:"required"`
+	IsDone bool   `json:"is_done" validate:"boolean"`
 }
 
 type Task struct {
